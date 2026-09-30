@@ -1,0 +1,14 @@
+{
+  "name": "cia-spycam",
+  "version": "2.0.0",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "selftest": "SPYCAM_SELFTEST=1 electron . --dev"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5"
+  }
+}
