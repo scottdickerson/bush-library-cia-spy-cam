@@ -1,0 +1,12 @@
+html, body, #root { margin: 0; height: 100%; background: #000; overflow: hidden; cursor: none; }
+
+/* Stage is the video's native 1280x1024, scaled to fit the screen, so the
+   camera box coordinates stay in the video's own pixels. */
+.stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 1024px; transform-origin: 0 0; }
+.movie { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.cam { position: absolute; object-fit: cover; opacity: 0; transition: opacity .4s;
+       filter: grayscale(1) contrast(1.6) brightness(1.1) sepia(1) hue-rotate(55deg) saturate(4); }
+.scanlines { position: absolute; pointer-events: none; opacity: 0; transition: opacity .4s;
+             background: repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,.35) 2px 4px); }
+.on { opacity: 1; }

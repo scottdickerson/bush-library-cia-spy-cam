@@ -1,14 +1,27 @@
 {
   "name": "cia-spycam",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
-  "main": "main.js",
+  "main": "out/main/index.js",
   "scripts": {
-    "start": "electron .",
-    "dev": "electron . --dev",
-    "selftest": "SPYCAM_SELFTEST=1 electron . --dev"
+    "dev": "electron-vite dev -- --dev",
+    "build": "electron-vite build",
+    "start": "electron-vite build && electron .",
+    "typecheck": "tsc --noEmit",
+    "selftest": "electron-vite build && SPYCAM_SELFTEST=1 electron . --dev"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "electron": "^44.4.5"
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^44.9.0",
+    "electron-vite": "^6.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
   }
 }
