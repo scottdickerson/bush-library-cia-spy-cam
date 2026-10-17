@@ -8,6 +8,9 @@ const CAM_START = 40.8; // seconds: box goes black
 // seconds: the whole screen cuts to black at 60.1; ending here lets the
 // 0.4s fade-out finish by then
 const CAM_END = 59.7;
+// seconds: main fades back in to the seal and "PLACE HAND ON SCANNER BELOW",
+// so the touchscreen returns to "Place right hand" at the same moment
+const TOUCH_RESET_AT = 72.0;
 // Substring of the camera's name to prefer; '' = first camera found.
 const CAMERA_LABEL = '';
 
@@ -59,11 +62,17 @@ export function MainScreen() {
   useEffect(() => {
     const m = movie.current!;
     let frame = 0;
+    let touchReset = false;
     const tick = () => {
       setCamOn(!m.paused && m.currentTime >= CAM_START && m.currentTime < CAM_END);
+      if (!touchReset && m.currentTime >= TOUCH_RESET_AT) {
+        touchReset = true;
+        window.spycam.send('reset');
+      }
       if (!m.paused) frame = requestAnimationFrame(tick);
     };
     const offScan = window.spycam.on('scan', () => {
+      touchReset = false;
       m.currentTime = 0;
       m.play();
       frame = requestAnimationFrame(tick);
@@ -74,10 +83,10 @@ export function MainScreen() {
     };
   }, []);
 
+  // The touchscreen was already reset at TOUCH_RESET_AT; park on the seal frame.
   const onEnded = () => {
     setCamOn(false);
     movie.current!.currentTime = 0;
-    window.spycam.send('reset');
   };
 
   const on = camOn ? ' on' : '';

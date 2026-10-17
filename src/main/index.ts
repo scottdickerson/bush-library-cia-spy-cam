@@ -99,7 +99,10 @@ async function selftest(mainWin: BrowserWindow, touchWin: BrowserWindow): Promis
   await wait(15000);
   await snap(mainWin, 'main-65s-no-camera.png');
   console.log('SELFTEST touch still running at 65s (expected true):', await touchRunning());
-  await wait(12000);
-  console.log('SELFTEST touch reset after main ended (expected true):', !(await touchRunning()));
+  // 73s: main is back on its seal screen (from 72s) but its video has not
+  // ended (75s), so this fails if the touchscreen only resets on 'ended'.
+  await wait(8000);
+  await snap(mainWin, 'main-73s-seal.png');
+  console.log('SELFTEST touch reset with main seal screen (expected true):', !(await touchRunning()));
   app.quit();
 }
