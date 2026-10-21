@@ -23,7 +23,7 @@ Built with [electron-vite](https://electron-vite.org); output goes to `out/`.
 - `src/renderer/src/MainScreen.tsx` plays `media/main.mp4` and overlays the camera between 40.8 s and 59.7 s (the screen cuts to black at 60.1 s).
 - `src/renderer/public/media/` holds both videos.
 - `src/preload/index.ts` exposes the `window.spycam` messaging API (typed in `src/renderer/src/spycam.ts`).
-- `src/main/index.ts` places the windows: the touch window goes on the display reporting touch support, otherwise the non-primary one. With one display, both windows sit side by side (1280 + 800 wide), matching the original 2080×1024 spanning window.
+- `src/main/index.ts` places the windows: the touch window goes on the display reporting touch support, otherwise the non-primary one. With one display, both windows sit side by side (1280 + 800 wide), matching the original 2080×1024 spanning window. It also keeps the displays awake, and reloads a window whose renderer crashes; a main-screen crash also resets the touchscreen, which would otherwise wait on "Access granted" for a reset that never comes.
 
 ## Calibration
 

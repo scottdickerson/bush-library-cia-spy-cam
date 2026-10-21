@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen, type Rectangle } from 'electron';
+import { app, BrowserWindow, ipcMain, powerSaveBlocker, screen, type Rectangle } from 'electron';
 import { join } from 'path';
 import { mkdirSync, writeFileSync } from 'fs';
 
@@ -65,6 +65,20 @@ app.whenReady().then(() => {
   ipcMain.on('scan', () => mainWin.webContents.send('scan'));
   ipcMain.on('reset', () => touchWin.webContents.send('reset'));
   ipcMain.on('quit', () => app.quit());
+
+  // Unattended exhibit: keep the displays on, and bring a window back if its renderer dies
+  // (bad decode, GPU out of memory) instead of leaving a black screen.
+  powerSaveBlocker.start('prevent-display-sleep');
+  mainWin.webContents.on('render-process-gone', (_e, details) => {
+    console.error(`Main screen renderer gone (${details.reason}), reloading`);
+    mainWin.reload();
+    // The touchscreen waits for main's 'reset' after a scan; a crash mid-run would leave it stuck.
+    touchWin.webContents.send('reset');
+  });
+  touchWin.webContents.on('render-process-gone', (_e, details) => {
+    console.error(`Touch screen renderer gone (${details.reason}), reloading`);
+    touchWin.reload();
+  });
 
   if (SELFTEST) selftest(mainWin, touchWin);
 });
