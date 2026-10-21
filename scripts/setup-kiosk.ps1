@@ -1,0 +1,192 @@
+<#
+Configures Windows Assigned Access for the CIA Spycam exhibit.
+Windows creates its own kiosk account and signs into it automatically at boot.
+
+-Mode Restricted (default)  Restricted user experience: Windows auto-launches the app on a
+                       locked-down desktop (taskbar hidden, empty Start, only this app allowed to
+                       run). The app's two fullscreen windows cover both displays. Windows does not
+                       relaunch the app if it quits.
+-Mode Kiosk            Single-app kiosk: Windows runs only the app and relaunches it if it closes.
+                       It's built around one fullscreen app, so it may not suit this app's two
+                       windows, and it reported "We weren't able to start your app" for a similar
+                       Electron app.
+
+Both modes also set machine-wide policies (every account, including admins):
+  - Touch lockdown: no swipe-in from any screen edge (AllowEdgeSwipe=0), no Widgets board
+    (AllowNewsAndInterests=0), no Store apps running in the background (LetAppsRunInBackground=2).
+    Search stays on for admins; kiosk-user-settings.ps1 hides the search box in the kiosk account only.
+  - No Xbox Game Bar: game recording off (AllowGameDVR=0), and the Game Bar app is uninstalled
+    for every account. It treats fullscreen kiosk apps as games, and its background task
+    caused "blocked" popups in restricted mode on the HCHM Extraordinary Stories kiosk.
+  - Windows Update: no update notifications or restart warnings; updates install and the PC
+    restarts daily at -UpdateHour (default 3 = 3 AM). The kiosk signs back in on its own.
+    With -NoUpdates, automatic updates are turned off instead (NoAutoUpdate=1); run Windows
+    Update by hand from an admin account now and then. Rerunning without -NoUpdates switches
+    back to the nightly schedule.
+  - No Windows Security notifications (Defender keeps running) and no crash dialogs.
+  - Power: never sleep, never turn off the display, hibernate off.
+-Remove clears the policies (power settings are left as they are, and removed apps aren't
+reinstalled; get them back from the Microsoft Store if needed).
+
+Per-account popups (notifications, backup reminder, "finish setting up", OneDrive) are handled
+by kiosk-user-settings.ps1, which runs while the kiosk account is signed out.
+
+Must run as SYSTEM (not just Administrator). From an admin Command Prompt:
+  PsExec.exe -i -s powershell.exe
+then in that window:
+  powershell -ExecutionPolicy Bypass -File <repo>\scripts\setup-kiosk.ps1 [-Mode Restricted]
+Restart afterwards. Staff exit: Ctrl+Alt+Del, sign out.
+
+To remove it, run the same way with -Remove (or run remove-kiosk.ps1), then restart.
+#>
+param(
+  [string]$AppPath = 'C:\Program Files\CIA Spycam\CIA Spycam.exe',
+  [ValidateSet('Kiosk', 'Restricted')]
+  [string]$Mode = 'Restricted',
+  [ValidateRange(0, 23)]
+  [int]$UpdateHour = 3,
+  [switch]$NoUpdates,
+  [switch]$Remove
+)
+$ErrorActionPreference = 'Stop'
+
+if ([Security.Principal.WindowsIdentity]::GetCurrent().Name -ne 'NT AUTHORITY\SYSTEM') {
+  throw 'Run this as SYSTEM: open an admin Command Prompt, run "PsExec.exe -i -s powershell.exe", and run the script from that window.'
+}
+
+$obj = Get-CimInstance -Namespace 'root\cimv2\mdm\dmmap' -ClassName 'MDM_AssignedAccess'
+
+$wu = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate'
+$policies = @(
+  # Touch gestures can't open the Windows shell.
+  @{ Key = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\EdgeUI'; Name = 'AllowEdgeSwipe'; Value = 0 }
+  # No Widgets board (WidgetBoard.exe), which restricted mode would otherwise block with a popup.
+  @{ Key = 'HKLM:\SOFTWARE\Policies\Microsoft\Dsh'; Name = 'AllowNewsAndInterests'; Value = 0 }
+  # Store apps can't run in the background (2 = Force Deny), so backgroundTaskHost.exe isn't launched for them.
+  @{ Key = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy'; Name = 'LetAppsRunInBackground'; Value = 2 }
+  # No Windows game recording, which Xbox Game Bar is built on.
+  @{ Key = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR'; Name = 'AllowGameDVR'; Value = 0 }
+  # Windows Update: no notifications (2 = none, including restart warnings) ...
+  @{ Key = $wu; Name = 'SetUpdateNotificationLevel'; Value = 1 }
+  @{ Key = $wu; Name = 'UpdateNotificationLevel'; Value = 2 }
+  # No Windows Security popups (protection stays on) and no "has stopped working" dialogs.
+  @{ Key = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications'; Name = 'DisableNotifications'; Value = 1 }
+  @{ Key = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting'; Name = 'DontShowUI'; Value = 1 }
+)
+
+# Windows Update schedule: auto-install with a daily (0 = every day) restart at $UpdateHour ...
+$updateSchedule = @(
+  @{ Key = "$wu\AU"; Name = 'AUOptions'; Value = 4 }
+  @{ Key = "$wu\AU"; Name = 'ScheduledInstallDay'; Value = 0 }
+  @{ Key = "$wu\AU"; Name = 'ScheduledInstallTime'; Value = $UpdateHour }
+)
+# ... or, with -NoUpdates, no automatic updates at all.
+$updatesOff = @(
+  @{ Key = "$wu\AU"; Name = 'NoAutoUpdate'; Value = 1 }
+)
+# Set the chosen one; the other goes on the cleared list so switching modes doesn't leave both.
+if ($NoUpdates) { $policies += $updatesOff; $unusedUpdates = $updateSchedule }
+else { $policies += $updateSchedule; $unusedUpdates = $updatesOff }
+
+# Set by earlier versions of this script; always cleared now. DisableSearch was machine-wide and
+# took Search away from admins too.
+$retired = @(
+  @{ Key = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search'; Name = 'DisableSearch' }
+) + $unusedUpdates
+
+if ($Remove) {
+  $obj.Configuration = $null
+  Set-CimInstance -CimInstance $obj
+  foreach ($p in $policies + $retired) {
+    Remove-ItemProperty -Path $p.Key -Name $p.Name -ErrorAction SilentlyContinue
+  }
+  Write-Host 'Kiosk mode and kiosk policies removed. Restart to apply.'
+  return
+}
+
+if (-not (Test-Path $AppPath)) {
+  throw "App not found at $AppPath. Copy dist\win-unpacked to C:\Program Files\CIA Spycam, or pass -AppPath."
+}
+
+$escapedPath = [System.Security.SecurityElement]::Escape($AppPath)
+
+if ($Mode -eq 'Kiosk') {
+  $profileXml = @"
+      <KioskModeApp v4:ClassicAppPath="$escapedPath" />
+"@
+} else {
+  # Element order follows Microsoft's Windows 11 sample: AllAppsList, StartPins, Taskbar.
+  $profileXml = @"
+      <AllAppsList>
+        <AllowedApps>
+          <App DesktopAppPath="$escapedPath" rs5:AutoLaunch="true" />
+          <!-- Windows' host for Store apps' background tasks; blocking it only causes popups. -->
+          <App DesktopAppPath="%windir%\System32\backgroundTaskHost.exe" />
+        </AllowedApps>
+      </AllAppsList>
+      <v5:StartPins><![CDATA[{ "pinnedList": [] }]]></v5:StartPins>
+      <Taskbar ShowTaskbar="false" />
+"@
+}
+
+$config = @"
+<?xml version="1.0" encoding="utf-8"?>
+<AssignedAccessConfiguration xmlns="http://schemas.microsoft.com/AssignedAccess/2017/config" xmlns:rs5="http://schemas.microsoft.com/AssignedAccess/201810/config" xmlns:v4="http://schemas.microsoft.com/AssignedAccess/2021/config" xmlns:v5="http://schemas.microsoft.com/AssignedAccess/2022/config">
+  <Profiles>
+    <Profile Id="{91C536F2-5F7C-4B25-92DE-87E721995747}">
+$profileXml
+    </Profile>
+  </Profiles>
+  <Configs>
+    <Config>
+      <AutoLogonAccount rs5:DisplayName="CIA Spycam" />
+      <DefaultProfile Id="{91C536F2-5F7C-4B25-92DE-87E721995747}" />
+    </Config>
+  </Configs>
+</AssignedAccessConfiguration>
+"@
+
+$obj.Configuration = [System.Net.WebUtility]::HtmlEncode($config)
+Set-CimInstance -CimInstance $obj
+
+$skipped = @()
+foreach ($p in $policies) {
+  try {
+    # Only create a missing key: New-Item -Force on an existing key wipes its other values.
+    if (-not (Test-Path $p.Key)) { New-Item -Path $p.Key -Force | Out-Null }
+    New-ItemProperty -Path $p.Key -Name $p.Name -Value $p.Value -PropertyType DWord -Force | Out-Null
+  } catch {
+    # Tamper Protection refuses Defender policy keys even for SYSTEM; don't let one refusal stop the rest.
+    Write-Warning "Couldn't set $($p.Name) in $($p.Key): $($_.Exception.Message)"
+    $skipped += $p
+  }
+}
+if ($skipped | Where-Object { $_.Key -like '*Windows Defender*' }) {
+  Write-Warning 'Windows Security notifications are still on: Tamper Protection blocks that setting. To set it, turn off Windows Security > Virus & threat protection > Manage settings > Tamper Protection, rerun this script, then turn Tamper Protection back on.'
+}
+foreach ($p in $retired) {
+  Remove-ItemProperty -Path $p.Key -Name $p.Name -ErrorAction SilentlyContinue
+}
+
+# Store apps the kiosk doesn't need whose background tasks trigger "blocked" popups. Removed for
+# every account and from the image for new accounts. Add more package names here if the
+# AppLocker logs point at another one.
+$removeApps = @('Microsoft.XboxGamingOverlay')
+foreach ($name in $removeApps) {
+  try {
+    Get-AppxPackage -AllUsers -Name $name | Remove-AppxPackage -AllUsers
+    Get-AppxProvisionedPackage -Online | Where-Object DisplayName -eq $name | Remove-AppxProvisionedPackage -Online | Out-Null
+    Write-Host "Removed $name (if it was installed)."
+  } catch {
+    Write-Warning "Couldn't remove $name`: $($_.Exception.Message). Try from an admin PowerShell: Get-AppxPackage -AllUsers $name | Remove-AppxPackage -AllUsers"
+  }
+}
+
+# Never sleep or blank the screen on AC power; the app also holds the display awake while running.
+powercfg /change standby-timeout-ac 0
+powercfg /change monitor-timeout-ac 0
+powercfg /hibernate off
+
+$policyNote = if ($skipped) { "$($skipped.Count) kiosk setting(s) skipped (see warnings above)" } else { 'Kiosk settings applied' }
+$updateNote = if ($NoUpdates) { 'automatic Windows updates are off' } else { "updates restart the PC daily at ${UpdateHour}:00" }
+Write-Host "$Mode mode configured to run $AppPath. $policyNote; $updateNote. Restart to apply."

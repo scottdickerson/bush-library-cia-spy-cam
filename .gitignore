@@ -2,3 +2,4 @@ node_modules/
 selftest/
 out/
 .DS_Store
+dist/

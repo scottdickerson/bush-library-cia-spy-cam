@@ -8,7 +8,8 @@
     "build": "electron-vite build",
     "start": "electron-vite build && electron .",
     "typecheck": "tsc --noEmit",
-    "selftest": "electron-vite build && SPYCAM_SELFTEST=1 electron . --dev"
+    "selftest": "electron-vite build && SPYCAM_SELFTEST=1 electron . --dev",
+    "dist:win": "electron-vite build && electron-builder --win"
   },
   "dependencies": {
     "react": "^19.3.1",
@@ -20,8 +21,19 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^6.1.2",
     "electron": "^44.9.0",
+    "electron-builder": "^26.15.3",
     "electron-vite": "^6.0.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.4"
+  },
+  "build": {
+    "appId": "org.bushlibrary.cia-spycam",
+    "productName": "CIA Spycam",
+    "files": [
+      "out/**"
+    ],
+    "win": {
+      "target": "zip"
+    }
   }
 }
