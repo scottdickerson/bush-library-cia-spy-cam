@@ -1,7 +1,8 @@
 // Camera-feed looks. Each is an SVG filter applied with CSS `filter: url(#id)`.
 //
 // An ordinary camera sees light, not heat: bright walls and windows would read
-// "hot" and faces "cold". So every look first builds a fake heat image:
+// "hot" and faces "cold". So the green and thermal looks first build a fake
+// heat image (bw is a plain black-and-white feed):
 //   heat = 0.75 × skin + 0.30 × brightness + 0.05
 // Skin is detected by colour (YCbCr chroma), so faces and hands come out hot and
 // the room cool, with a little brightness kept for texture. This needs a colour
@@ -9,7 +10,7 @@
 // A gradient map then turns heat into the palette: each table lists one colour
 // channel at evenly spaced heat stops, coldest first.
 
-export const FEED_FILTERS = ['green', 'thermal', 'whitehot'] as const;
+export const FEED_FILTERS = ['green', 'thermal', 'bw'] as const;
 export type FeedFilter = (typeof FEED_FILTERS)[number];
 /** Look used when none is chosen with --filter. */
 export const DEFAULT_FILTER: FeedFilter = 'thermal';
@@ -95,19 +96,21 @@ export function FeedFilters() {
         <GradientMap r="0 0 0 0 1 1 1" g="0 0 0.9 1 1 0.15 1" b="0.25 1 1 0 0 0 1" />
       </filter>
 
-      {/* whitehot: black-and-white infrared, hot is white. A bright tone
-          curve, then a glow taken from just the hottest parts so they bloom. */}
-      <filter id="whitehot" x="0" y="0" width="1" height="1" colorInterpolationFilters="sRGB">
-        <Heat id="whitehot" />
-        <GradientMap
-          r="0.04 0.20 0.42 0.68 0.90 1"
-          g="0.04 0.20 0.42 0.68 0.90 1"
-          b="0.04 0.20 0.42 0.68 0.90 1"
-          result="whitehot-base"
+      {/* bw: plain black-and-white feed with a little extra contrast; no
+          heat estimate */}
+      <filter id="bw" x="0" y="0" width="1" height="1" colorInterpolationFilters="sRGB">
+        <feColorMatrix
+          type="matrix"
+          values="0.2126 0.7152 0.0722 0 0
+                  0.2126 0.7152 0.0722 0 0
+                  0.2126 0.7152 0.0722 0 0
+                  0      0      0      1 0"
         />
-        <GradientMap r="0 0 0 0.2 0.7 1" g="0 0 0 0.2 0.7 1" b="0 0 0 0.2 0.7 1" />
-        <feGaussianBlur stdDeviation="8" edgeMode="duplicate" result="whitehot-glow" />
-        <feBlend in="whitehot-base" in2="whitehot-glow" mode="screen" />
+        <feComponentTransfer>
+          <feFuncR type="linear" slope="1.2" intercept="-0.05" />
+          <feFuncG type="linear" slope="1.2" intercept="-0.05" />
+          <feFuncB type="linear" slope="1.2" intercept="-0.05" />
+        </feComponentTransfer>
       </filter>
     </svg>
   );

@@ -7,7 +7,7 @@
     "dev": "electron-vite dev -- --dev",
     "camera:green": "electron-vite dev -- --dev --camera --filter=green",
     "camera:thermal": "electron-vite dev -- --dev --camera --filter=thermal",
-    "camera:whitehot": "electron-vite dev -- --dev --camera --filter=whitehot",
+    "camera:bw": "electron-vite dev -- --dev --camera --filter=bw",
     "build": "electron-vite build",
     "start": "electron-vite build && electron .",
     "typecheck": "tsc --noEmit",
