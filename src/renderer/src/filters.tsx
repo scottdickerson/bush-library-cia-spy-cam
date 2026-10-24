@@ -1,14 +1,8 @@
 // Camera-feed looks. Each is an SVG filter applied with CSS `filter: url(#id)`.
-//
-// An ordinary camera sees light, not heat: bright walls and windows would read
-// "hot" and faces "cold". So the green and thermal looks first build a fake
-// heat image (bw is a plain black-and-white feed):
-//   heat = 0.75 × skin + 0.30 × brightness + 0.05
-// Skin is detected by colour (YCbCr chroma), so faces and hands come out hot and
-// the room cool, with a little brightness kept for texture. This needs a colour
-// camera; with a black-and-white camera only the brightness term remains.
-// A gradient map then turns heat into the palette: each table lists one colour
-// channel at evenly spaced heat stops, coldest first.
+// All three reduce the camera image to brightness with extra contrast. green and
+// thermal then pass it through a gradient map, using brightness as stand-in
+// "heat": each table lists one colour channel at evenly spaced brightness
+// stops, darkest first.
 
 export const FEED_FILTERS = ['green', 'thermal', 'bw'] as const;
 export type FeedFilter = (typeof FEED_FILTERS)[number];
@@ -18,48 +12,22 @@ export const DEFAULT_FILTER: FeedFilter = 'thermal';
 export const isFeedFilter = (s: string | null): s is FeedFilter =>
   (FEED_FILTERS as readonly string[]).includes(s ?? '');
 
-// Band-pass lookup over 20 equal steps (0.05 each): 1 inside the band, 0 outside.
-const band = (fromStep: number, toStep: number) =>
-  Array.from({ length: 20 }, (_, i) => (i >= fromStep && i <= toStep ? 1 : 0)).join(' ');
-// Typical skin chroma: Cr ≈ 0.55–0.70, Cb ≈ 0.30–0.50.
-const CR_SKIN = band(11, 13);
-const CB_SKIN = band(6, 9);
-
-// Fake heat image, left in every channel. `id` keeps result names unique per filter.
-function Heat({ id }: { id: string }) {
-  const r = (name: string) => `${id}-${name}`;
+// Brightness (Rec. 709 luma) in every channel, then a linear contrast stretch.
+function Brightness({ slope, intercept }: { slope: number; intercept: number }) {
   return (
     <>
-      {/* Brightness (Rec. 709 luma) in every channel */}
       <feColorMatrix
-        in="SourceGraphic"
         type="matrix"
         values="0.2126 0.7152 0.0722 0 0
                 0.2126 0.7152 0.0722 0 0
                 0.2126 0.7152 0.0722 0 0
                 0      0      0      1 0"
-        result={r('lum')}
       />
-      {/* Chroma: Cr into red, Cb into green, then keep only skin-coloured values */}
-      <feColorMatrix
-        in="SourceGraphic"
-        type="matrix"
-        values=" 0.500 -0.419 -0.081 0 0.5
-                -0.169 -0.331  0.500 0 0.5
-                 0      0      0     0 0
-                 0      0      0     1 0"
-      />
-      <feComponentTransfer result={r('chroma')}>
-        <feFuncR type="discrete" tableValues={CR_SKIN} />
-        <feFuncG type="discrete" tableValues={CB_SKIN} />
+      <feComponentTransfer>
+        <feFuncR type="linear" slope={slope} intercept={intercept} />
+        <feFuncG type="linear" slope={slope} intercept={intercept} />
+        <feFuncB type="linear" slope={slope} intercept={intercept} />
       </feComponentTransfer>
-      {/* skin = Cr-in-band × Cb-in-band, spread into every channel */}
-      <feColorMatrix in={r('chroma')} type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 1 0" result={r('cr')} />
-      <feColorMatrix in={r('chroma')} type="matrix" values="0 1 0 0 0  0 1 0 0 0  0 1 0 0 0  0 0 0 1 0" result={r('cb')} />
-      <feComposite in={r('cr')} in2={r('cb')} operator="arithmetic" k1="1" result={r('skin')} />
-      <feComposite in={r('skin')} in2={r('lum')} operator="arithmetic" k2="0.75" k3="0.30" k4="0.05" />
-      {/* The arithmetic step also blends alpha; make the result fully opaque. */}
-      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 1" />
     </>
   );
 }
@@ -80,32 +48,20 @@ export function FeedFilters() {
       {/* green: the original night-vision green, with hot areas going
           bright yellow-green to white */}
       <filter id="green" x="0" y="0" width="1" height="1" colorInterpolationFilters="sRGB">
-        <Heat id="green" />
+        <Brightness slope={1.4} intercept={-0.2} />
         <GradientMap r="0 0 0.05 0.35 0.85 1" g="0 0.30 0.60 0.90 1 1" b="0 0.03 0.08 0.15 0.45 1" />
       </filter>
 
       {/* thermal: colour heat map, "Predator" style; cold is dark blue,
           then cyan, green, yellow, red, and the hottest areas white */}
       <filter id="thermal" x="0" y="0" width="1" height="1" colorInterpolationFilters="sRGB">
-        <Heat id="thermal" />
+        <Brightness slope={1.4} intercept={-0.2} />
         <GradientMap r="0 0 0 0 1 1 1" g="0 0 0.9 1 1 0.15 1" b="0.25 1 1 0 0 0 1" />
       </filter>
 
-      {/* bw: plain black-and-white feed with a little extra contrast; no
-          heat estimate */}
+      {/* bw: plain black-and-white feed with a little extra contrast */}
       <filter id="bw" x="0" y="0" width="1" height="1" colorInterpolationFilters="sRGB">
-        <feColorMatrix
-          type="matrix"
-          values="0.2126 0.7152 0.0722 0 0
-                  0.2126 0.7152 0.0722 0 0
-                  0.2126 0.7152 0.0722 0 0
-                  0      0      0      1 0"
-        />
-        <feComponentTransfer>
-          <feFuncR type="linear" slope="1.2" intercept="-0.05" />
-          <feFuncG type="linear" slope="1.2" intercept="-0.05" />
-          <feFuncB type="linear" slope="1.2" intercept="-0.05" />
-        </feComponentTransfer>
+        <Brightness slope={1.2} intercept={-0.05} />
       </filter>
     </svg>
   );

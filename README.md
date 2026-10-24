@@ -30,7 +30,7 @@ Built with [electron-vite](https://electron-vite.org); output goes to `out/`.
 
 ## Camera look
 
-Three looks live in `src/renderer/src/filters.tsx`: `green`, `thermal` and `bw`. `bw` is a plain black-and-white feed. A normal camera records light, not heat, so `green` and `thermal` first estimate heat: skin (detected by colour) is hot, everything else cool with a little brightness kept for texture. This needs a colour camera; a black-and-white camera only gets the brightness part. The exhibit uses `DEFAULT_FILTER` from that file; `npm start -- --filter=bw` (or `npm run dev -- --filter=...`) overrides it.
+Three looks live in `src/renderer/src/filters.tsx`: `green`, `thermal` and `bw`. `bw` is a plain black-and-white feed; `green` and `thermal` colour the image by brightness, so brighter areas read as hotter. The exhibit uses `DEFAULT_FILTER` from that file; `npm start -- --filter=bw` (or `npm run dev -- --filter=...`) overrides it.
 
 ## Calibration
 
