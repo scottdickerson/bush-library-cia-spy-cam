@@ -8,7 +8,9 @@ Electron + React + TypeScript rebuild of the 2007 CIA Spycam exhibit: a hand-sca
 npm install
 npm start          # build, then run the kiosk fullscreen on the two displays
 npm run dev        # framed windows side by side, with live reload
-npm run camera     # one window with just the filtered camera feed and overlay, for tuning the look
+npm run camera:green     # one window: live camera over the 50 s frame, green night vision + heat
+npm run camera:thermal   # same, colour heat map ("Predator" style)
+npm run camera:whitehot  # same, black-and-white infrared with white-hot glow
 npm run typecheck  # TypeScript check
 npm run selftest   # build, fake camera, one scan, screenshots saved to selftest/
 npm run dist:win   # Windows app folder in dist/win-unpacked/ + a zip of it (run on Windows)
@@ -25,6 +27,10 @@ Built with [electron-vite](https://electron-vite.org); output goes to `out/`.
 - `src/renderer/public/media/` holds both videos.
 - `src/preload/index.ts` exposes the `window.spycam` messaging API (typed in `src/renderer/src/spycam.ts`).
 - `src/main/index.ts` places the windows: the touch window goes on the display reporting touch support, otherwise the non-primary one. With one display, both windows sit side by side (1280 + 800 wide), matching the original 2080×1024 spanning window. It also keeps the displays awake, and reloads a window whose renderer crashes; a main-screen crash also resets the touchscreen, which would otherwise wait on "Access granted" for a reset that never comes.
+
+## Camera look
+
+Three looks live in `src/renderer/src/filters.tsx`: `green`, `thermal` and `whitehot`. The exhibit uses `DEFAULT_FILTER` from that file; `npm start -- --filter=whitehot` (or `npm run dev -- --filter=...`) overrides it.
 
 ## Calibration
 

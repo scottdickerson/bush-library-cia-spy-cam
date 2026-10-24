@@ -5,7 +5,9 @@
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev -- --dev",
-    "camera": "electron-vite dev -- --dev --camera",
+    "camera:green": "electron-vite dev -- --dev --camera --filter=green",
+    "camera:thermal": "electron-vite dev -- --dev --camera --filter=thermal",
+    "camera:whitehot": "electron-vite dev -- --dev --camera --filter=whitehot",
     "build": "electron-vite build",
     "start": "electron-vite build && electron .",
     "typecheck": "tsc --noEmit",

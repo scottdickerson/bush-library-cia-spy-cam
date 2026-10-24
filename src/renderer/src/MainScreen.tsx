@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { SatelliteHud, ThermalFilter } from './SatelliteHud';
+import { FeedFilters, type FeedFilter } from './filters';
+import { SatelliteHud } from './SatelliteHud';
 import { useEscapeToQuit } from './useEscapeToQuit';
 
 // Calibration: measured from main.mp4, where the "LIVE FEED FROM THERMAL
@@ -30,8 +31,15 @@ async function openCamera(): Promise<MediaStream> {
   return navigator.mediaDevices.getUserMedia({ video });
 }
 
-/** `cameraOnly`: skip the video and show just the filtered feed (`npm run camera`). */
-export function MainScreen({ cameraOnly = false }: { cameraOnly?: boolean }) {
+// Frame of main.mp4 shown behind the feed in camera-only mode: mid live-feed segment.
+const CAMERA_ONLY_FRAME = 50;
+
+/**
+ * `cameraOnly`: hold the video on its live-feed frame and show the feed
+ * permanently, for tuning the look (`npm run camera:*`).
+ * `filter`: which camera-feed look to apply.
+ */
+export function MainScreen({ cameraOnly, filter }: { cameraOnly: boolean; filter: FeedFilter }) {
   const movie = useRef<HTMLVideoElement>(null);
   const cam = useRef<HTMLVideoElement>(null);
   const [scale, setScale] = useState(fitScale);
@@ -62,8 +70,11 @@ export function MainScreen({ cameraOnly = false }: { cameraOnly?: boolean }) {
   }, []);
 
   useEffect(() => {
-    const m = movie.current;
-    if (!m) return; // camera-only mode has no video
+    const m = movie.current!;
+    if (cameraOnly) {
+      m.currentTime = CAMERA_ONLY_FRAME; // applied once the video has loaded
+      return;
+    }
     let frame = 0;
     let touchReset = false;
     const tick = () => {
@@ -84,7 +95,7 @@ export function MainScreen({ cameraOnly = false }: { cameraOnly?: boolean }) {
       offScan();
       cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [cameraOnly]);
 
   // The touchscreen was already reset at TOUCH_RESET_AT; park on the seal frame.
   const onEnded = () => {
@@ -96,19 +107,24 @@ export function MainScreen({ cameraOnly = false }: { cameraOnly?: boolean }) {
 
   return (
     <div className="stage" style={{ transform: `scale(${scale}) translate(-50%, -50%)` }}>
-      {!cameraOnly && (
-        <video
-          ref={movie}
-          className="movie"
-          src="media/main.mp4"
-          muted
-          playsInline
-          preload="auto"
-          onEnded={onEnded}
-        />
-      )}
-      <ThermalFilter />
-      <video ref={cam} className={`cam${on}`} style={CAM_BOX} muted playsInline autoPlay />
+      <video
+        ref={movie}
+        className="movie"
+        src="media/main.mp4"
+        muted
+        playsInline
+        preload="auto"
+        onEnded={onEnded}
+      />
+      <FeedFilters />
+      <video
+        ref={cam}
+        className={`cam${on}`}
+        style={{ ...CAM_BOX, filter: `url(#${filter})` }}
+        muted
+        playsInline
+        autoPlay
+      />
       <div className={`scanlines${on}`} style={CAM_BOX} />
       <SatelliteHud className={on} style={CAM_BOX} />
     </div>

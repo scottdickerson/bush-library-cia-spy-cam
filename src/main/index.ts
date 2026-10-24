@@ -4,8 +4,18 @@ import { mkdirSync, writeFileSync } from 'fs';
 
 const DEV = process.argv.includes('--dev');
 const SELFTEST = !!process.env.SPYCAM_SELFTEST;
-// `npm run camera`: one window showing only the filtered camera feed, for tuning the look.
+// `npm run camera:*`: one window showing only the filtered camera feed, for tuning the look.
 const CAMERA_ONLY = process.argv.includes('--camera');
+// --filter=green|thermal|whitehot picks the camera-feed look (renderer default otherwise).
+const FILTER = process.argv.find((a) => a.startsWith('--filter='))?.slice('--filter='.length);
+
+function mainQuery(): string {
+  const q = new URLSearchParams();
+  if (CAMERA_ONLY) q.set('camera', '');
+  if (FILTER) q.set('filter', FILTER);
+  const s = q.toString();
+  return s ? `?${s}` : '';
+}
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 if (SELFTEST) {
@@ -62,12 +72,12 @@ app.whenReady().then(() => {
   ipcMain.on('quit', () => app.quit());
 
   if (CAMERA_ONLY) {
-    makeWindow('main', pickBounds().main, '?camera');
+    makeWindow('main', pickBounds().main, mainQuery());
     return;
   }
 
   const bounds = pickBounds();
-  const mainWin = makeWindow('main', bounds.main);
+  const mainWin = makeWindow('main', bounds.main, mainQuery());
   const touchWin = makeWindow('touch', bounds.touch);
 
   // Touch page starts a run; main page ends it. Relay both ways.

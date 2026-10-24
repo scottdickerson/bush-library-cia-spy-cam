@@ -5,9 +5,8 @@ html, body, #root { margin: 0; height: 100%; background: #000; overflow: hidden;
 .stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 1024px; transform-origin: 0 0; }
 .movie { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-/* Thermal false-colour palette; the SVG filter lives in SatelliteHud.tsx. */
-.cam { position: absolute; object-fit: cover; opacity: 0; transition: opacity .4s;
-       filter: url(#thermal); }
+/* The colour filter is set inline from filters.tsx. */
+.cam { position: absolute; object-fit: cover; opacity: 0; transition: opacity .4s; }
 .scanlines { position: absolute; pointer-events: none; opacity: 0; transition: opacity .4s;
              background: repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,.35) 2px 4px); }
 /* Satellite downlink overlay, in the green of the exhibit's own graphics. */
