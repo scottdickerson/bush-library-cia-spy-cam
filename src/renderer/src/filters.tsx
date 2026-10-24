@@ -30,12 +30,9 @@ function Heat({ id }: { id: string }) {
   const r = (name: string) => `${id}-${name}`;
   return (
     <>
-      {/* Thermal sensors are low resolution; soften a little. */}
-      {/* edgeMode="duplicate" stops the blur pulling in transparent pixels at the frame edge. */}
-      <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" edgeMode="duplicate" result={r('src')} />
       {/* Brightness (Rec. 709 luma) in every channel */}
       <feColorMatrix
-        in={r('src')}
+        in="SourceGraphic"
         type="matrix"
         values="0.2126 0.7152 0.0722 0 0
                 0.2126 0.7152 0.0722 0 0
@@ -45,7 +42,7 @@ function Heat({ id }: { id: string }) {
       />
       {/* Chroma: Cr into red, Cb into green, then keep only skin-coloured values */}
       <feColorMatrix
-        in={r('src')}
+        in="SourceGraphic"
         type="matrix"
         values=" 0.500 -0.419 -0.081 0 0.5
                 -0.169 -0.331  0.500 0 0.5
@@ -59,9 +56,7 @@ function Heat({ id }: { id: string }) {
       {/* skin = Cr-in-band × Cb-in-band, spread into every channel */}
       <feColorMatrix in={r('chroma')} type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 1 0" result={r('cr')} />
       <feColorMatrix in={r('chroma')} type="matrix" values="0 1 0 0 0  0 1 0 0 0  0 1 0 0 0  0 0 0 1 0" result={r('cb')} />
-      <feComposite in={r('cr')} in2={r('cb')} operator="arithmetic" k1="1" />
-      {/* Body heat bleeds outward a little */}
-      <feGaussianBlur stdDeviation="4" edgeMode="duplicate" result={r('skin')} />
+      <feComposite in={r('cr')} in2={r('cb')} operator="arithmetic" k1="1" result={r('skin')} />
       <feComposite in={r('skin')} in2={r('lum')} operator="arithmetic" k2="0.75" k3="0.30" k4="0.05" />
       {/* The arithmetic step also blends alpha; make the result fully opaque. */}
       <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 1" />
