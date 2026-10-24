@@ -6,7 +6,7 @@ const DEV = process.argv.includes('--dev');
 const SELFTEST = !!process.env.SPYCAM_SELFTEST;
 // `npm run camera:*`: one window showing only the filtered camera feed, for tuning the look.
 const CAMERA_ONLY = process.argv.includes('--camera');
-// --filter=green|thermal|bw picks the camera-feed look (renderer default otherwise).
+// --filter=green|thermal|thermal-skin|bw picks the camera-feed look (renderer default otherwise).
 const FILTER = process.argv.find((a) => a.startsWith('--filter='))?.slice('--filter='.length);
 
 function mainQuery(): string {

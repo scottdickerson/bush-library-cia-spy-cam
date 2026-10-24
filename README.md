@@ -10,6 +10,7 @@ npm start          # build, then run the kiosk fullscreen on the two displays
 npm run dev        # framed windows side by side, with live reload
 npm run camera:green     # one window: live camera over the 50 s frame, green night vision + heat
 npm run camera:thermal   # same, colour heat map ("Predator" style)
+npm run camera:thermal-skin  # same palette, but skin (detected by colour) is the hottest part
 npm run camera:bw        # same, plain black-and-white feed
 npm run typecheck  # TypeScript check
 npm run selftest   # build, fake camera, one scan, screenshots saved to selftest/
@@ -30,7 +31,7 @@ Built with [electron-vite](https://electron-vite.org); output goes to `out/`.
 
 ## Camera look
 
-Three looks live in `src/renderer/src/filters.tsx`: `green`, `thermal` and `bw`. `bw` is a plain black-and-white feed; `green` and `thermal` colour the image by brightness, so brighter areas read as hotter. The exhibit uses `DEFAULT_FILTER` from that file; `npm start -- --filter=bw` (or `npm run dev -- --filter=...`) overrides it.
+Four looks live in `src/renderer/src/filters.tsx`: `green`, `thermal`, `thermal-skin` and `bw`. `bw` is a plain black-and-white feed; `green` and `thermal` colour the image by brightness, so brighter areas read as hotter. `thermal-skin` uses the thermal palette but treats skin (detected by colour) as the heat source, so faces and hands read hot and the room cool; it needs a colour camera. The exhibit uses `DEFAULT_FILTER` from that file; `npm start -- --filter=bw` (or `npm run dev -- --filter=...`) overrides it.
 
 ## Calibration
 
