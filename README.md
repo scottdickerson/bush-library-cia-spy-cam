@@ -8,6 +8,7 @@ Electron + React + TypeScript rebuild of the 2007 CIA Spycam exhibit: a hand-sca
 npm install
 npm start          # build, then run the kiosk fullscreen on the two displays
 npm run dev        # framed windows side by side, with live reload
+npm run camera     # one window with just the filtered camera feed and overlay, for tuning the look
 npm run typecheck  # TypeScript check
 npm run selftest   # build, fake camera, one scan, screenshots saved to selftest/
 npm run dist:win   # Windows app folder in dist/win-unpacked/ + a zip of it (run on Windows)

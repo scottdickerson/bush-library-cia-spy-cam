@@ -4,6 +4,8 @@ import { mkdirSync, writeFileSync } from 'fs';
 
 const DEV = process.argv.includes('--dev');
 const SELFTEST = !!process.env.SPYCAM_SELFTEST;
+// `npm run camera`: one window showing only the filtered camera feed, for tuning the look.
+const CAMERA_ONLY = process.argv.includes('--camera');
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 if (SELFTEST) {
@@ -40,7 +42,7 @@ function pickBounds(): Record<Page, Rectangle> {
   return { main: main.bounds, touch: touch.bounds };
 }
 
-function makeWindow(page: Page, bounds: Rectangle): BrowserWindow {
+function makeWindow(page: Page, bounds: Rectangle, query = ''): BrowserWindow {
   const win = new BrowserWindow({
     ...bounds,
     frame: DEV,
@@ -51,12 +53,19 @@ function makeWindow(page: Page, bounds: Rectangle): BrowserWindow {
   });
   // electron-vite dev serves the renderer over HTTP; built apps load files.
   const devUrl = process.env.ELECTRON_RENDERER_URL;
-  if (devUrl) win.loadURL(`${devUrl}/${page}.html`);
-  else win.loadFile(join(__dirname, `../renderer/${page}.html`));
+  if (devUrl) win.loadURL(`${devUrl}/${page}.html${query}`);
+  else win.loadFile(join(__dirname, `../renderer/${page}.html`), { search: query });
   return win;
 }
 
 app.whenReady().then(() => {
+  ipcMain.on('quit', () => app.quit());
+
+  if (CAMERA_ONLY) {
+    makeWindow('main', pickBounds().main, '?camera');
+    return;
+  }
+
   const bounds = pickBounds();
   const mainWin = makeWindow('main', bounds.main);
   const touchWin = makeWindow('touch', bounds.touch);
@@ -64,7 +73,6 @@ app.whenReady().then(() => {
   // Touch page starts a run; main page ends it. Relay both ways.
   ipcMain.on('scan', () => mainWin.webContents.send('scan'));
   ipcMain.on('reset', () => touchWin.webContents.send('reset'));
-  ipcMain.on('quit', () => app.quit());
 
   // Unattended exhibit: keep the displays on, and bring a window back if its renderer dies
   // (bad decode, GPU out of memory) instead of leaving a black screen.

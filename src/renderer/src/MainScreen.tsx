@@ -30,7 +30,8 @@ async function openCamera(): Promise<MediaStream> {
   return navigator.mediaDevices.getUserMedia({ video });
 }
 
-export function MainScreen() {
+/** `cameraOnly`: skip the video and show just the filtered feed (`npm run camera`). */
+export function MainScreen({ cameraOnly = false }: { cameraOnly?: boolean }) {
   const movie = useRef<HTMLVideoElement>(null);
   const cam = useRef<HTMLVideoElement>(null);
   const [scale, setScale] = useState(fitScale);
@@ -61,7 +62,8 @@ export function MainScreen() {
   }, []);
 
   useEffect(() => {
-    const m = movie.current!;
+    const m = movie.current;
+    if (!m) return; // camera-only mode has no video
     let frame = 0;
     let touchReset = false;
     const tick = () => {
@@ -90,19 +92,21 @@ export function MainScreen() {
     movie.current!.currentTime = 0;
   };
 
-  const on = camOn ? ' on' : '';
+  const on = camOn || cameraOnly ? ' on' : '';
 
   return (
     <div className="stage" style={{ transform: `scale(${scale}) translate(-50%, -50%)` }}>
-      <video
-        ref={movie}
-        className="movie"
-        src="media/main.mp4"
-        muted
-        playsInline
-        preload="auto"
-        onEnded={onEnded}
-      />
+      {!cameraOnly && (
+        <video
+          ref={movie}
+          className="movie"
+          src="media/main.mp4"
+          muted
+          playsInline
+          preload="auto"
+          onEnded={onEnded}
+        />
+      )}
       <ThermalFilter />
       <video ref={cam} className={`cam${on}`} style={CAM_BOX} muted playsInline autoPlay />
       <div className={`scanlines${on}`} style={CAM_BOX} />

@@ -5,6 +5,6 @@ import './main.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MainScreen />
+    <MainScreen cameraOnly={new URLSearchParams(location.search).has('camera')} />
   </StrictMode>,
 );
