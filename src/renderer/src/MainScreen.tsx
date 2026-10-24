@@ -120,7 +120,7 @@ export function MainScreen({ cameraOnly, filter }: { cameraOnly: boolean; filter
       <video
         ref={cam}
         className={`cam${on}`}
-        style={{ ...CAM_BOX, filter: `url(#${filter})` }}
+        style={{ ...CAM_BOX, filter: filter === 'none' ? undefined : `url(#${filter})` }}
         muted
         playsInline
         autoPlay

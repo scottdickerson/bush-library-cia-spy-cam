@@ -3,9 +3,10 @@
 // contrast. green and thermal then pass it through a gradient map, using
 // brightness as stand-in "heat": each table lists one colour channel at evenly
 // spaced brightness stops, darkest first. thermal-skin uses the thermal
-// palette but makes skin the heat source (see SkinHeat).
+// palette but makes skin the heat source (see SkinHeat). none shows the raw
+// camera image, with no SVG filter.
 
-export const FEED_FILTERS = ['green', 'thermal', 'thermal-skin', 'bw'] as const;
+export const FEED_FILTERS = ['green', 'thermal', 'thermal-skin', 'bw', 'none'] as const;
 export type FeedFilter = (typeof FEED_FILTERS)[number];
 /** Look used when none is chosen with --filter. */
 export const DEFAULT_FILTER: FeedFilter = 'thermal';
