@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { SatelliteHud, ThermalFilter } from './SatelliteHud';
 import { useEscapeToQuit } from './useEscapeToQuit';
 
 // Calibration: measured from main.mp4, where the "LIVE FEED FROM THERMAL
@@ -102,8 +103,10 @@ export function MainScreen() {
         preload="auto"
         onEnded={onEnded}
       />
+      <ThermalFilter />
       <video ref={cam} className={`cam${on}`} style={CAM_BOX} muted playsInline autoPlay />
       <div className={`scanlines${on}`} style={CAM_BOX} />
+      <SatelliteHud className={on} style={CAM_BOX} />
     </div>
   );
 }

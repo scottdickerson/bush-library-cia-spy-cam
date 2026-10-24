@@ -5,8 +5,23 @@ html, body, #root { margin: 0; height: 100%; background: #000; overflow: hidden;
 .stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 1024px; transform-origin: 0 0; }
 .movie { position: absolute; inset: 0; width: 100%; height: 100%; }
 
+/* Thermal false-colour palette; the SVG filter lives in SatelliteHud.tsx. */
 .cam { position: absolute; object-fit: cover; opacity: 0; transition: opacity .4s;
-       filter: grayscale(1) contrast(1.6) brightness(1.1) sepia(1) hue-rotate(55deg) saturate(4); }
+       filter: url(#thermal); }
 .scanlines { position: absolute; pointer-events: none; opacity: 0; transition: opacity .4s;
              background: repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,.35) 2px 4px); }
+/* Satellite downlink overlay, in the green of the exhibit's own graphics. */
+.hud { position: absolute; pointer-events: none; opacity: 0; transition: opacity .4s;
+       color: #8dff6a; font: 600 15px/1 ui-monospace, Menlo, Consolas, monospace;
+       letter-spacing: .08em; text-shadow: 0 0 4px rgba(0,0,0,.9); }
+.hud-lines { position: absolute; inset: 0; width: 100%; height: 100%;
+             fill: none; stroke: #8dff6a; stroke-width: 2; opacity: .85; }
+.hud-tl, .hud-tr, .hud-bl, .hud-br { position: absolute; }
+.hud-tl { top: 30px; left: 72px; }
+.hud-tr { top: 30px; right: 72px; }
+.hud-bl { bottom: 30px; left: 72px; }
+.hud-br { bottom: 30px; right: 72px; }
+.hud-live { color: #ff4040; animation: blink 1s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+
 .on { opacity: 1; }
