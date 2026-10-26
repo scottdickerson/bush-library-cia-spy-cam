@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { FeedFilters, type FeedFilter } from './filters';
+import { FeedFilters, cssFilter, showsOverlay, type FeedFilter } from './filters';
 import { SatelliteHud } from './SatelliteHud';
 import { useEscapeToQuit } from './useEscapeToQuit';
 
@@ -120,13 +120,13 @@ export function MainScreen({ cameraOnly, filter }: { cameraOnly: boolean; filter
       <video
         ref={cam}
         className={`cam${on}`}
-        style={{ ...CAM_BOX, filter: filter === 'none' ? undefined : `url(#${filter})` }}
+        style={{ ...CAM_BOX, filter: cssFilter(filter) }}
         muted
         playsInline
         autoPlay
       />
       <div className={`scanlines${on}`} style={CAM_BOX} />
-      <SatelliteHud className={on} style={CAM_BOX} />
+      {showsOverlay(filter) && <SatelliteHud className={on} style={CAM_BOX} />}
     </div>
   );
 }

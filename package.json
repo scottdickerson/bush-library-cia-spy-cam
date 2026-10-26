@@ -8,6 +8,7 @@
     "camera": "electron-vite dev -- --dev --camera --filter=none",
     "camera:green": "electron-vite dev -- --dev --camera --filter=green",
     "camera:thermal": "electron-vite dev -- --dev --camera --filter=thermal",
+    "camera:thermal-plain": "electron-vite dev -- --dev --camera --filter=thermal-plain",
     "camera:thermal-skin": "electron-vite dev -- --dev --camera --filter=thermal-skin",
     "camera:bw": "electron-vite dev -- --dev --camera --filter=bw",
     "build": "electron-vite build",

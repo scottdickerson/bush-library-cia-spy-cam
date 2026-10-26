@@ -4,15 +4,23 @@
 // brightness as stand-in "heat": each table lists one colour channel at evenly
 // spaced brightness stops, darkest first. thermal-skin uses the thermal
 // palette but makes skin the heat source (see SkinHeat). none shows the raw
-// camera image, with no SVG filter.
+// camera image, with no SVG filter. thermal-plain is thermal without the
+// satellite overlay.
 
-export const FEED_FILTERS = ['green', 'thermal', 'thermal-skin', 'bw', 'none'] as const;
+export const FEED_FILTERS = ['green', 'thermal', 'thermal-plain', 'thermal-skin', 'bw', 'none'] as const;
 export type FeedFilter = (typeof FEED_FILTERS)[number];
 /** Look used when none is chosen with --filter. */
-export const DEFAULT_FILTER: FeedFilter = 'thermal';
+export const DEFAULT_FILTER: FeedFilter = 'thermal-plain';
 
 export const isFeedFilter = (s: string | null): s is FeedFilter =>
   (FEED_FILTERS as readonly string[]).includes(s ?? '');
+
+/** CSS filter for a look: its SVG filter, or none for the raw camera. */
+export const cssFilter = (f: FeedFilter) =>
+  f === 'none' ? undefined : `url(#${f === 'thermal-plain' ? 'thermal' : f})`;
+
+/** Whether a look draws the satellite overlay (crosshair, brackets, text). */
+export const showsOverlay = (f: FeedFilter) => f !== 'thermal-plain';
 
 // Brightness (Rec. 709 luma) in every channel, then a linear contrast stretch.
 function Brightness({ slope, intercept }: { slope: number; intercept: number }) {
