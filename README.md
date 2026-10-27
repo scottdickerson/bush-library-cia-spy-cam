@@ -351,7 +351,8 @@ The feed works when you run the app from your admin account, but the sensor box 
 
 The app puts the touch window on the display that reports touch support, and the main window on the other. If they're swapped, Windows isn't reporting the touchscreen as touch-capable on that display, or the touchscreen is mapped to the wrong monitor:
 
-- Open **Control Panel > Tablet PC Settings > Setup** (search for "Calibrate the screen for pen or touch input") and run **Touch input** setup, tapping the touchscreen when asked. That tells Windows which monitor the touch panel belongs to.
+- Tell Windows which monitor the touch panel belongs to: **Control Panel > Hardware and Sound > Tablet PC Settings > Display > Setup… > Touch input** (or search for "Calibrate the screen for pen or touch input", or run `MultiDigiMon.exe -touch` from Win+R). A white prompt appears on each screen in turn: tap it on the touchscreen, and press **Enter** to skip it on the main screen, which has no touch.
+- If the Windows mapping doesn't stick, the Elo touch driver's own configuration can also assign the touchscreen to a display.
 - In **Settings > System > Display**, make the main screen the primary display; with no touch display reported, the app puts the touch window on the non-primary one.
 
 ### Smart App Control
