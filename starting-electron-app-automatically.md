@@ -30,7 +30,9 @@ Workarounds in place on this kiosk:
 
 - **Edge swipes off** for every account: `AllowEdgeSwipe` = 0 (`setup-kiosk.ps1`).
 - **Multi-finger gestures off** in the Elo touch driver's configuration (works for every account). `kiosk-user-settings.ps1` also sets `TouchGestureSetting` = 0 for the kiosk account, a community-reported value Microsoft doesn't document.
-- **Taskbar on the main display only** (`MMTaskbarEnabled` = 0, `kiosk-user-settings.ps1`), with the large non-touch screen set as the main display, so the touchscreen has no taskbar to swipe up.
+- **Taskbar on the main display only** (`MMTaskbarEnabled` = 0, `kiosk-user-settings.ps1`), with the large non-touch screen set as the main display, so the touchscreen has no taskbar to swipe up. Confirmed to stop the bottom-edge swipe here, but only because the touchscreen is a second display.
+
+**Single-touchscreen kiosks** (most kiosks) can't use that last workaround: the only display is the main one, so it always has a taskbar, and in restricted mode a one-finger swipe up from the bottom can show it. For those, don't run Explorer at all: Shell Launcher v2 on Enterprise / IoT Enterprise, or the `Winlogon\Shell` replacement on Pro.
 - **Touchscreen mapped to its monitor** with Tablet PC Settings, so the app puts each window on the right display (see the README's **The windows are on the wrong displays**).
 
 ## Shell Launcher v2 (recommended for future kiosks)
