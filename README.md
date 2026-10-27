@@ -86,7 +86,7 @@ Windows creates a kiosk account, signs into it at boot, and launches the app; it
 
 Search stays available to admin accounts; the kiosk account can't reach it (see Troubleshooting).
 
-`kiosk-user-settings.ps1` handles popups that belong to the kiosk account itself, in that account and in the Default profile (the template for new accounts): app notifications (including the Windows Backup reminder), the notification panel, "Let's finish setting up your device", the welcome screen after updates, tips and suggestions, the search box, and OneDrive starting at sign-in.
+`kiosk-user-settings.ps1` handles popups that belong to the kiosk account itself, in that account and in the Default profile (the template for new accounts): app notifications (including the Windows Backup reminder), the notification panel, "Let's finish setting up your device", the welcome screen after updates, tips and suggestions, the search box, and OneDrive starting at sign-in. It also turns off three- and four-finger touch gestures (`TouchGestureSetting` = 0 under `Control Panel\Desktop`), since a three-finger swipe down minimizes the app and there's no taskbar to bring it back.
 
 ### Before leaving it unattended
 
@@ -312,6 +312,8 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\EdgeUI" /v AllowEdgeSwipe /t R
 Undo with `reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\EdgeUI" /v AllowEdgeSwipe /f`.
 
 Search is only turned off for the kiosk account: with edge swipes off, the taskbar hidden, and no keyboard out, there's no way to reach it, and `kiosk-user-settings.ps1` also hides the search box there. Windows' own `DisableSearch` policy can't be limited to one account, so it isn't used.
+
+`TouchGestureSetting` is a community-reported value, not one Microsoft documents. If a three-finger swipe still works after a restart, find the real value: in the kiosk account, run `reg export "HKCU\Control Panel\Desktop" C:\before.reg /y`, turn the Settings toggle below off, export again to `C:\after.reg`, and compare with `fc C:\before.reg C:\after.reg`.
 
 If a gesture still gets through, check these in the kiosk account (restricted mode may hide Settings there, so set them before setting up the kiosk):
 
