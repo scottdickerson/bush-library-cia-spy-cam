@@ -125,7 +125,6 @@ export function MainScreen({ cameraOnly, filter }: { cameraOnly: boolean; filter
         playsInline
         autoPlay
       />
-      <div className={`scanlines${on}`} style={CAM_BOX} />
       {showsOverlay(filter) && <SatelliteHud className={on} style={CAM_BOX} />}
     </div>
   );

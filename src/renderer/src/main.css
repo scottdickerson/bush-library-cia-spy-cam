@@ -7,8 +7,6 @@ html, body, #root { margin: 0; height: 100%; background: #000; overflow: hidden;
 
 /* The colour filter is set inline from filters.tsx. */
 .cam { position: absolute; object-fit: cover; opacity: 0; transition: opacity .4s; }
-.scanlines { position: absolute; pointer-events: none; opacity: 0; transition: opacity .4s;
-             background: repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,.35) 2px 4px); }
 /* Satellite downlink overlay, in the green of the exhibit's own graphics. */
 .hud { position: absolute; pointer-events: none; opacity: 0; transition: opacity .4s;
        color: #8dff6a; font: 600 15px/1 ui-monospace, Menlo, Consolas, monospace;
