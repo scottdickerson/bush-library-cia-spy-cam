@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CIA Spycam Kiosk Care</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap" />
+<style>
+  :root {
+    --paper: #fff; --surface: #fff; --ink: #000; --muted: #333; --rule: #bbb;
+    --accent: #2f6b1f; --gold: #c8962e; --gold-soft: #f6ead0;
+    --stop: #a3251a; --stop-soft: #f9e5e1;
+    --display: 'Bebas Neue', 'Impact', 'Arial Narrow', sans-serif;
+    --body: 'Atkinson Hyperlegible', 'Verdana', 'Segoe UI', system-ui, sans-serif;
+  }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 13pt/1.55 var(--body); }
+  .wrap { display: grid; gap: 28px; }
+  h1, h2 { font-family: var(--display); font-weight: 400; letter-spacing: 0.03em; line-height: 1.02; margin: 0; }
+  h1 { font-size: 76px; }
+  h1 span { color: var(--accent); }
+  h2 { font-size: 42px; break-after: avoid; }
+  h3 { font-size: 19px; line-height: 1.3; margin: 0; }
+  p { margin: 0; }
+  section { display: grid; gap: 16px; }
+  .kicker { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  kbd { font: 700 0.85em/1 var(--body); padding: 3px 7px; border: 1.5px solid var(--ink); border-bottom-width: 3px; border-radius: 4px; white-space: nowrap; }
+  code { font-size: 0.9em; overflow-wrap: anywhere; }
+  header { display: grid; gap: 14px; padding-bottom: 20px; border-bottom: 4px solid var(--ink); }
+  .lede { font-size: 21px; color: var(--muted); }
+  .fill { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; background: var(--gold-soft); border: 2px solid var(--ink); border-radius: 6px; padding: 16px 18px; break-inside: avoid; }
+  .fill div { display: grid; gap: 6px; }
+  .fill b { font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .fill span { border-bottom: 1.5px solid var(--ink); min-height: 1.6em; }
+  .normal { display: grid; border-top: 1px solid var(--rule); }
+  .normal div { display: grid; grid-template-columns: 200px 1fr; gap: 4px 20px; padding-block: 12px; border-bottom: 1px solid var(--rule); break-inside: avoid; }
+  .fix { display: grid; gap: 14px; }
+  .card { border: 1.5px solid var(--rule); border-left: 6px solid var(--gold); border-radius: 6px; padding: 16px 18px; display: grid; gap: 10px; break-inside: avoid; }
+  .card.call { border-left-color: var(--stop); }
+  .card ol, .card ul { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+  .tag { justify-self: start; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 8px; border-radius: 3px; background: var(--gold-soft); }
+  .card.call .tag { background: var(--stop-soft); color: var(--stop); }
+  table { border-collapse: collapse; width: 100%; font-size: 16px; }
+  th, td { text-align: left; border: 1px solid var(--rule); padding: 8px 10px; }
+  th { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
+  td { height: 2.2em; }
+  .secret { border: 2.5px solid var(--stop); border-radius: 8px; padding: 18px 20px; display: grid; gap: 12px; }
+  .cred { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; align-items: end; }
+  .cred b { font-size: 19px; }
+  .cred code { font-size: 18px; font-weight: 700; }
+  .cred .blank { border-bottom: 1.5px solid var(--ink); min-height: 1.6em; max-width: 260px; }
+  .tech { font-size: 15px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 16px; display: grid; gap: 10px; }
+  .tech ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+  #log, #staff { break-before: page; }
+  @page { margin: 0.5in; }
+  *, *::before, *::after { box-sizing: border-box; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Bush Library · CIA Spy Cam exhibit</div>
+    <h1>Kiosk care <span>&amp; feeding</span></h1>
+    <p class="lede">For staff and volunteers. The exhibit looks after itself almost all the time. This page covers what normal looks like, how to restart it when something's wrong, and when to call for help.</p>
+  </header>
+
+  <section>
+    <div class="kicker">Keep with the kiosk</div>
+    <div class="fill">
+      <div><b>Who to call</b><span></span></div>
+      <div><b>Phone or email</b><span></span></div>
+      <div><b>Keyboard &amp; mouse are kept</b><span></span></div>
+      <div><b>Installed on</b><span></span></div>
+      <div><b>Admin password is kept</b><span></span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kicker">What normal looks like</div>
+    <h2>It runs itself</h2>
+    <div class="normal">
+      <div><b>Two screens</b><p>The large screen shows the CIA seal and "Place hand on scanner below". The small touchscreen below it shows "Place right hand".</p></div>
+      <div><b>Always on</b><p>The exhibit stays on all the time. After a restart or a power outage it turns itself back on and shows both screens within a couple of minutes. You don't need to press or type anything.</p></div>
+      <div><b>A visitor touches the scanner</b><p>The touchscreen plays the hand scan, and the large screen plays a "satellite" sequence of about 75 seconds.</p></div>
+      <div><b>The live feed</b><p>About 40 seconds in, the box marked "Live feed from thermal X-ray sensor" shows the visitor in heat-map colors for about 20 seconds. That's a real camera aimed at the visitor.</p></div>
+      <div><b>After the sequence</b><p>Both screens go back to the seal and "Place right hand" on their own. Touching the scanner again during a sequence does nothing until it's finished.</p></div>
+      <div><b>No sound</b><p>The exhibit is silent. That's normal.</p></div>
+      <div><b>Around 3 AM</b><p>The computer restarts itself every night to install Windows updates. The screens may be dark for a few minutes, then the seal comes back.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kicker">Before you fix anything</div>
+    <h2>First, wait</h2>
+    <p>If a sequence is playing, let it finish. It takes about a minute and a quarter, then both screens go back to the start by themselves. Most "stuck" screens are a sequence that's still playing.</p>
+  </section>
+
+  <section>
+    <div class="kicker">The one fix that solves most things</div>
+    <h2>Restart the computer</h2>
+    <p>Use whichever of these you can.</p>
+    <div class="fix">
+      <div class="card">
+        <span class="tag">With the keyboard</span>
+        <ol>
+          <li>Plug in the keyboard.</li>
+          <li>Press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Delete</kbd> together.</li>
+          <li>Tap the power icon in the bottom-right corner, then <b>Restart</b>.</li>
+          <li>Wait. Both screens come back by themselves in a couple of minutes.</li>
+          <li>Unplug the keyboard and put it away.</li>
+        </ol>
+        <p>Don't press <kbd>Esc</kbd> while the exhibit is running: it closes the exhibit. If that happens, restart the computer.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Without a keyboard</span>
+        <ol>
+          <li>Press and <b>hold</b> the computer's power button for about 10 seconds, until it turns off.</li>
+          <li>Wait 10 seconds.</li>
+          <li>Press the power button once. Both screens come back by themselves in a couple of minutes.</li>
+        </ol>
+        <p>This is fine to do now and then. Don't make a habit of it if the keyboard is available.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kicker">Common problems</div>
+    <h2>What do you see?</h2>
+    <div class="fix">
+      <div class="card">
+        <h3>The live feed box stays black or frozen</h3>
+        <ul>
+          <li>The camera connects through a long network cable with a small box at each end (a USB extender). Check that both boxes have their lights on and that their cables are plugged in firmly.</li>
+          <li>Check that nothing is covering or blocking the camera.</li>
+          <li>Restart the computer. The rest of the exhibit still works without the camera; only the live feed box stays black.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>The live feed shows the wrong spot</h3>
+        <ul>
+          <li>The camera has been bumped. Gently aim it back at where visitors stand at the scanner.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Touching the scanner does nothing</h3>
+        <ul>
+          <li>Wait for any sequence on the large screen to finish, then touch once.</li>
+          <li>If the touchscreen is dark, check its power light and its power adapter.</li>
+          <li>If it ignores every touch, check that its cables are plugged in firmly at both ends, then restart the computer.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>A screen is black</h3>
+        <ul>
+          <li>Between about 3 and 3:15 AM this is normal. It's installing updates.</li>
+          <li>Check the monitor's power light. If it's off, press the monitor's power button.</li>
+          <li>Check the computer's power light. If it's off, press the computer's power button once.</li>
+          <li>If everything's on and it's still black after 5 minutes, restart the computer.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>The taskbar appears at the bottom of a screen</h3>
+        <ul>
+          <li>Someone swiped up from the bottom edge. Tap the middle of the exhibit and it goes away.</li>
+          <li>If it stays, restart the computer.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>A message box appears over the exhibit</h3>
+        <ul>
+          <li>Take a photo of it with your phone.</li>
+          <li>If it has a <b>Close</b>, <b>OK</b>, or <b>X</b> button, tap that. Don't tap anything else in it.</li>
+          <li>If it comes back, restart the computer, then send the photo to the person on the contact line above.</li>
+        </ul>
+      </div>
+      <div class="card call">
+        <span class="tag">Call for help</span>
+        <h3>The screens are swapped, or you see the Windows desktop, a password screen, or "We weren't able to start your app"</h3>
+        <ul>
+          <li>Restart the computer once.</li>
+          <li>If it comes back the same way, don't try to sign in or change anything. Take a photo and contact the person on the contact line above.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="log">
+    <div class="kicker">Problem log</div>
+    <h2>What happened, and what you did</h2>
+    <table>
+      <thead><tr><th style="width:16%">Date &amp; time</th><th style="width:38%">What you saw</th><th style="width:30%">What you did</th><th style="width:16%">Your name</th></tr></thead>
+      <tbody>
+        <tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+    <div class="tech">
+      <p><b>For the technical contact</b></p>
+      <ul>
+        <li>Setup, the kiosk scripts, and Windows troubleshooting are in the README at github.com/scottdickerson/bush-library-cia-spy-cam. Kiosk options are compared in <code>starting-electron-app-automatically.md</code>.</li>
+        <li>To reach the admin account, press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Delete</kbd> and sign out. The app is installed in <code>C:\Program Files\CIA Spycam\</code>.</li>
+        <li>Windows runs the kiosk in Assigned Access restricted mode, which doesn't relaunch the app if it quits; a restart brings it back.</li>
+        <li>The touch window goes on the display Windows reports as touch-capable. If the screens are swapped, redo <b>Tablet PC Settings &gt; Setup &gt; Touch input</b> (README: "The windows are on the wrong displays").</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="staff">
+    <div class="kicker">Staff only · keep this page in the office, not with the kiosk</div>
+    <h2>Admin sign-in</h2>
+    <div class="secret">
+      <p>Only use this if the technical contact asks you to, for example over the phone. Visitors must never see this page: anyone with this password can turn off the kiosk's protections.</p>
+      <div class="cred">
+        <b>Username</b><span class="blank"></span>
+        <b>Password</b><span class="blank"></span>
+      </div>
+      <ol>
+        <li>Plug in the keyboard and press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Delete</kbd>, then choose <b>Sign out</b>.</li>
+        <li>On the sign-in screen, choose the admin account (or <b>Other user</b> and type the username), then type the password.</li>
+        <li>When you're done, restart the computer. It goes back to the exhibit by itself.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
