@@ -2,7 +2,8 @@
 Turns off per-account popups for the kiosk account: app notifications (including the
 Windows Backup reminder), the notification panel, "Let's finish setting up your device",
 the welcome screen after updates, tips and suggestions, the search box, and OneDrive starting
-at sign-in. Also turns off three- and four-finger touch gestures.
+at sign-in. Also turns off three- and four-finger touch gestures and shows the taskbar on the
+main display only.
 
 These are per-account settings, so they're written into the kiosk account's registry file
 and into the Default profile (the template for new accounts, in case the kiosk account is
@@ -34,6 +35,9 @@ $settings = @(
   # Three- and four-finger touch gestures off (three-finger swipe down minimizes the kiosk).
   # Community-reported value, not documented by Microsoft; if it has no effect, see README.
   @{ Key = 'Control Panel\Desktop'; Name = 'TouchGestureSetting'; Value = 0 }
+  # Taskbar on the main display only, so a swipe up on the touchscreen has no taskbar to show.
+  # The touchscreen must not be the main display (Settings > System > Display).
+  @{ Key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Name = 'MMTaskbarEnabled'; Value = 0 }
 )
 
 function Set-AccountSettings([string]$HiveFile, [string]$Label) {
