@@ -313,6 +313,8 @@ Undo with `reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\EdgeUI" /v Allow
 
 Search is only turned off for the kiosk account: with edge swipes off, the taskbar hidden, and no keyboard out, there's no way to reach it, and `kiosk-user-settings.ps1` also hides the search box there. Windows' own `DisableSearch` policy can't be limited to one account, so it isn't used.
 
+**Elo touchscreens:** multi-finger gestures can also be turned off in the Elo touch driver's own configuration. That setting applies to every account and doesn't rely on the registry value; it's what stopped the three-finger swipe on this kiosk.
+
 `TouchGestureSetting` is a community-reported value, not one Microsoft documents. If a three-finger swipe still works after a restart, find the real value: in the kiosk account, run `reg export "HKCU\Control Panel\Desktop" C:\before.reg /y`, turn the Settings toggle below off, export again to `C:\after.reg`, and compare with `fc C:\before.reg C:\after.reg`.
 
 If a gesture still gets through, check these in the kiosk account (restricted mode may hide Settings there, so set them before setting up the kiosk):
