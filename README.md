@@ -45,7 +45,7 @@ The camera is a USB (UVC) camera, which needs no driver. It sits about 50 ft fro
 
 ## Windows kiosk setup
 
-Windows' Settings > Set up a kiosk only lists Store apps and Edge, so the kiosk is configured with a script instead.
+Windows' Settings > Set up a kiosk only lists Store apps and Edge, so the kiosk is configured with a script instead. For how this compares with Shell Launcher and the other ways to start the app automatically, see [Starting the Electron app automatically](starting-electron-app-automatically.md).
 
 1. `npm run dist:win`, then copy `dist\win-unpacked\` to `C:\Program Files\CIA Spycam\`.
 2. Open a PowerShell window running as SYSTEM. The kiosk configuration can only be written by Windows' built-in SYSTEM account, not by an Administrator, so use PsExec:
